@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from account.serializers import UserLoginSerializer, UserProfileSerializer, UserSerializer
+from account.serializers import UserChangePasswordSerializer, UserLoginSerializer, UserProfileSerializer, UserSerializer, UserSetResetPasswordSerializer
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import authenticate
@@ -55,4 +55,31 @@ class UserProfileview(APIView):
     def get(self, request, format=None):
         serializer = UserProfileSerializer(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class UserChangePassword(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request, formate=None):
+        serializer = UserChangePasswordSerializer(data = request.data, context={'user': request.user})
+
+        if serializer.is_valid(raise_exception=True):
+            return Response({'msg': 'change password successfully'}, status=status.HTTP_200_OK)
+        
+        return Response(serializer.errors , status=status.HTTP_400_BAD_REQUEST)
+
+        
+class UserSetResetPassword(APIView):
+    def post(self, request, format=None):
+        serializer = UserSetResetPasswordSerializer(data=request.data)
+        
+        if serializer.is_valid(raise_exception=True):
+            return Response({'msg': 'password reset lint send, please check your email !'}, status=status.HTTP_200_OK)
+            
+        return Response(serializer.errors)
+
+
+
+
+
+
 
