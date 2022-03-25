@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from account.serializers import UserChangePasswordSerializer, UserLoginSerializer, UserProfileSerializer, UserSerializer, UserSetResetPasswordSerializer
+from account.serializers import UserChangePasswordSerializer, UserLoginSerializer, UserPasswordResetSerializer, UserProfileSerializer, UserSerializer, UserPasswordResetSerializer,UserSetResetPasswordSerializer
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import authenticate
@@ -21,14 +21,14 @@ class UserRegistrations(APIView):
     def post(self, request, format=None):
         serializer = UserSerializer(data = request.data)
 
-        if serializer.is_valid(raise_exception=True):
-            user = serializer.save()
-            # after save registration get token 
-            token = get_tokens_for_user(user)   
+        serializer.is_valid(raise_exception=True):
+        user = serializer.save()
+        # after save registration get token 
+        token = get_tokens_for_user(user)   
 
-            return Response({'token': token,'msg': 'registration successfully'}, status=status.HTTP_201_CREATED)
+        return Response({'token': token,'msg': 'registration successfully'}, status=status.HTTP_201_CREATED)
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class Userlogin(APIView):
     def post(self, request, formate=None):
@@ -75,6 +75,15 @@ class UserSetResetPassword(APIView):
         if serializer.is_valid(raise_exception=True):
             return Response({'msg': 'password reset lint send, please check your email !'}, status=status.HTTP_200_OK)
             
+        return Response(serializer.errors)
+
+class UserPasswordResetView(APIView):
+    def post(self, request, uid, token, format=None):
+        serializer = UserPasswordResetSerializer(data=request.data, context={'uid': uid, 'token': token})
+
+        if serializer.is_valid(raise_exception=True):
+            return Response({'msg': 'password reset successfully!'}, status=status.HTTP_200_OK)
+        
         return Response(serializer.errors)
 
 
