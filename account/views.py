@@ -21,7 +21,7 @@ class UserRegistrations(APIView):
     def post(self, request, format=None):
         serializer = UserSerializer(data = request.data)
 
-        serializer.is_valid(raise_exception=True):
+        serializer.is_valid(raise_exception=True)
         user = serializer.save()
         # after save registration get token 
         token = get_tokens_for_user(user)   
